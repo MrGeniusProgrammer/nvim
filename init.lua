@@ -1,10 +1,4 @@
--- print "hello, world"
-
-require("config.set")
-require("config.remap")
-require("config.lazy")
-
-
-
-
-
+require("mappings")
+require("autocmds")
+require("options")
+require("configs.lazy")
