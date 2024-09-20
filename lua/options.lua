@@ -84,20 +84,6 @@ I hope you enjoy your Neovim journey,
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
-vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-})
-
 
 -------------------------------------- globals -----------------------------------------
 -- Set <space> as the leader key
@@ -125,7 +111,7 @@ vim.g.loaded_ruby_provider = 0
 -- optnally enable 24-bit colour
 vim.opt.termguicolors = true
 
-vim.opt.guicursor = ""
+-- vim.opt.guicursor = ""
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -196,7 +182,30 @@ vim.opt.cursorline = true
 vim.opt.scrolloff = 10
 vim.opt.laststatus = 3
 
-vim.opt.fillchars = { eob = " " }
+vim.opt.list = true
+vim.opt.conceallevel = 3
+vim.opt.fillchars:append {
+	eob = " ",
+	fold = " ",
+	-- thick window separators
+	horiz = "▄",
+	vert = "█",
+	horizup = "█",
+	horizdown = "█",
+	vertleft = "█",
+	vertright = "█",
+	verthoriz = "█",
+}
+vim.opt.listchars = {
+	nbsp = "󰚌",
+	precedes = "…",
+	extends = "…",
+	multispace = "·",
+	tab = "│ ", -- mostly overridden by indent-blankline
+	lead = " ",
+	trail = " ",
+}
+
 vim.opt.ignorecase = true
 
 -- disable nvim intro
