@@ -8,6 +8,7 @@ return {
 		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
 		'folke/tokyonight.nvim',
 		priority = 1000, -- Make sure to load this before all the other start plugins.
+		lazy = false,
 		init = function()
 			-- Load the colorscheme here.
 			-- Like many other themes, this one has different styles, and you could load
@@ -21,10 +22,19 @@ return {
 
 	{
 		"nvim-tree/nvim-web-devicons",
+		lazy = false,
+	},
+
+	{
+		"tpope/vim-fugitive",
+		config = function()
+			vim.keymap.set("n", "<leader>g", vim.cmd.Git, { desc = "Open [G]it" })
+		end
 	},
 
 	{
 		'nvim-lualine/lualine.nvim',
+		lazy = false,
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
 		opts = function()
 			return require 'configs.lualine'
@@ -33,8 +43,9 @@ return {
 
 	{
 		"ThePrimeagen/harpoon",
+		lazy = false,
 		branch = "harpoon2",
-		opts = function ()
+		opts = function()
 			return require 'configs.harpoon'
 		end,
 		keys = function()
@@ -71,6 +82,7 @@ return {
 
 	{
 		"lukas-reineke/indent-blankline.nvim",
+		lazy = false,
 		event = "User FilePost",
 		opts = {
 			indent = { char = "│" },
@@ -86,6 +98,7 @@ return {
 	-- file managing , picker etc
 	{
 		"nvim-tree/nvim-tree.lua",
+		lazy = false,
 		cmd = { "NvimTreeToggle", "NvimTreeFocus" },
 		opts = function()
 			local api = require("nvim-tree.api")
@@ -94,14 +107,6 @@ return {
 			vim.keymap.set("n", "<C-n>", "<cmd>NvimTreeToggle<CR>",
 				{ desc = "nvimtree: toggle tree", silent = true, noremap = true })
 			vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeFocus<CR>", { desc = "nvimtree focus window" })
-
-
-			-- when exiting nvim-tree to delete its buffers
-			vim.api.nvim_create_autocmd('BufDelete', {
-				callback = function(state)
-					vim.opt.shada:append(state.file)
-				end
-			})
 
 			api.events.subscribe(api.events.Event.TreeOpen, function()
 				local tree_winid = api.tree.winid()
@@ -117,6 +122,7 @@ return {
 
 	{
 		"folke/which-key.nvim",
+		lazy = false,
 		keys = { "<leader>", "<c-r>", "<c-w>", '"', "'", "`", "c", "v", "g" },
 		cmd = "WhichKey",
 		config = function(_, opts)
@@ -127,22 +133,28 @@ return {
 	-- formatting!
 	{
 		"stevearc/conform.nvim",
-		opts = {
-			formatters_by_ft = {
-				lua = { "stylua" },
+		lazy = false,
+		opts = function()
+			return require "configs.conform"
+		end,
+		event = { 'BufWritePre' },
+		cmd = { 'ConformInfo' },
+		keys = {
+			{
+				'<leader>fb',
+				function()
+					require('conform').format { async = true, lsp_format = 'fallback' }
+				end,
+				mode = '',
+				desc = '[F]ormat [B]uffer',
 			},
 		},
-		config = function(_, opts)
-			require("conform").setup(opts)
-			vim.keymap.set("n", "<leader>fm", function()
-				require("conform").format { lsp_fallback = true }
-			end, { desc = "General Format file" })
-		end,
 	},
 
 	-- git stuff
 	{
 		"lewis6991/gitsigns.nvim",
+		lazy = false,
 		event = "User FilePost",
 		opts = function()
 			return require "configs.gitsigns"
@@ -152,6 +164,7 @@ return {
 	-- lsp stuff
 	{
 		"williamboman/mason.nvim",
+		lazy = false,
 		cmd = { "Mason", "MasonInstall", "MasonInstallAll", "MasonUpdate" },
 		opts = function()
 			return require "configs.mason"
@@ -176,15 +189,92 @@ return {
 
 	{
 		"neovim/nvim-lspconfig",
+		lazy = false,
 		event = "User FilePost",
+		dependencies = {
+			'williamboman/mason-lspconfig.nvim',
+			'WhoIsSethDaniel/mason-tool-installer.nvim',
+
+			-- Allows extra capabilities provided by nvim-cmp
+			'hrsh7th/cmp-nvim-lsp',
+
+			-- Useful status updates for LSP.
+			-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
+			{ 'j-hui/fidget.nvim', opts = {} },
+
+		},
 		config = function()
 			require("configs.lspconfig").defaults()
+
+			-- LSP servers and clients are able to communicate to each other what features they support.
+			--  By default, Neovim doesn't support everything that is in the LSP specification.
+			--  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
+			--  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+			local capabilities = require('configs.lspconfig').capabilities
+			capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+			-- Enable the following language servers
+			--  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
+			--
+			--  Add any additional override configuration in the following tables. Available keys are:
+			--  - cmd (table): Override the default command used to start the server
+			--  - filetypes (table): Override the default list of associated filetypes for the server
+			--  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
+			--  - settings (table): Override the default settings passed when initializing the server.
+			--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+			local servers = {
+				-- clangd = {},
+				-- gopls = {},
+				-- pyright = {},
+				-- rust_analyzer = {},
+				-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
+				--
+				-- Some languages (like typescript) have entire language plugins that can be useful:
+				--    https://github.com/pmizio/typescript-tools.nvim
+				--
+				-- But for many setups, the LSP (`tsserver`) will work just fine
+				-- tsserver = {},
+
+				lua_ls = {
+					-- cmd = {...},
+					-- filetypes = { ...},
+					-- capabilities = {},
+					settings = {
+						Lua = {
+							completion = {
+								callSnippet = 'Replace',
+							},
+							-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+							-- diagnostics = { disable = { 'missing-fields' } },
+						},
+					},
+				},
+			}
+
+			-- You can add other tools here that you want Mason to install
+			-- for you, so that they are available from within Neovim.
+			local ensure_installed = vim.tbl_keys(servers or {})
+			require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+
+			require('mason-lspconfig').setup {
+				handlers = {
+					function(server_name)
+						local server = servers[server_name] or {}
+						-- This handles overriding only values explicitly passed
+						-- by the server configuration above. Useful when disabling
+						-- certain features of an LSP (for example, turning off formatting for tsserver)
+						server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+						require('lspconfig')[server_name].setup(server)
+					end,
+				},
+			}
 		end,
 	},
 
 	-- load luasnips + cmp related in insert mode only
 	{
 		"hrsh7th/nvim-cmp",
+		lazy = false,
 		event = "InsertEnter",
 		dependencies = {
 			{
@@ -232,6 +322,7 @@ return {
 		"nvim-telescope/telescope.nvim",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 		cmd = "Telescope",
+		lazy = false,
 		opts = function()
 			return require "configs.telescope"
 		end,
@@ -278,6 +369,7 @@ return {
 
 	{
 		"nvim-treesitter/nvim-treesitter",
+		lazy = false,
 		event = { "BufReadPost", "BufNewFile" },
 		cmd = { "TSInstall", "TSBufEnable", "TSBufDisable", "TSModuleInfo" },
 		build = ":TSUpdate",

@@ -8,7 +8,7 @@ local options = {
 		update_root = false,
 	},
 	view = {
-		width = 30,
+		width = 50,
 		preserve_window_proportions = true,
 		side = "right",
 		number = true,
@@ -17,10 +17,10 @@ local options = {
 	diagnostics = {
 		enable = true,
 		icons = {
-      hint = "",
-      info = "",
-      warning = "",
-      error = ""
+			hint = "",
+			info = "",
+			warning = "",
+			error = ""
 		}
 	},
 	renderer = {
