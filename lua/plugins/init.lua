@@ -33,6 +33,22 @@ return {
 	},
 
 	{
+		'MeanderingProgrammer/render-markdown.nvim',
+		opts = function() return require 'configs.render-markdown' end,
+		dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+	},
+
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		build = "cd app && yarn install",
+		init = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+		end,
+		ft = { "markdown" },
+	},
+
+	{
 		'nvim-lualine/lualine.nvim',
 		lazy = false,
 		dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -101,12 +117,22 @@ return {
 		lazy = false,
 		cmd = { "NvimTreeToggle", "NvimTreeFocus" },
 		opts = function()
+			return require "configs.nvimtree"
+		end,
+		config = function(_, opts)
 			local api = require("nvim-tree.api")
 
 			-- global
-			vim.keymap.set("n", "<C-n>", "<cmd>NvimTreeToggle<CR>",
-				{ desc = "nvimtree: toggle tree", silent = true, noremap = true })
-			vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeFocus<CR>", { desc = "nvimtree focus window" })
+			vim.keymap.set(
+				"n",
+				"<leader>e",
+				api.tree.focus,
+				{
+					desc = "nvimtree: close tree when foucsed else focus on it when not selected",
+					silent = true,
+					noremap = true
+				}
+			)
 
 			api.events.subscribe(api.events.Event.TreeOpen, function()
 				local tree_winid = api.tree.winid()
@@ -116,8 +142,8 @@ return {
 				end
 			end)
 
-			return require "configs.nvimtree"
-		end,
+			require('nvim-tree').setup(opts)
+		end
 	},
 
 	{
@@ -204,7 +230,39 @@ return {
 
 		},
 		config = function()
-			require("configs.lspconfig").defaults()
+			-- Brief aside: **What is LSP?**
+			--
+			-- LSP is an initialism you've probably heard, but might not understand what it is.
+			--
+			-- LSP stands for Language Server Protocol. It's a protocol that helps editors
+			-- and language tooling communicate in a standardized fashion.
+			--
+			-- In general, you have a "server" which is some tool built to understand a particular
+			-- language (such as `gopls`, `lua_ls`, `rust_analyzer`, etc.). These Language Servers
+			-- (sometimes called LSP servers, but that's kind of like ATM Machine) are standalone
+			-- processes that communicate with some "client" - in this case, Neovim!
+			--
+			-- LSP provides Neovim with features like:
+			--  - Go to definition
+			--  - Find references
+			--  - Autocompletion
+			--  - Symbol Search
+			--  - and more!
+			--
+			-- Thus, Language Servers are external tools that must be installed separately from
+			-- Neovim. This is where `mason` and related plugins come into play.
+			--
+			-- If you're wondering about lsp vs treesitter, you can check out the wonderfully
+			-- and elegantly composed help section, `:help lsp-vs-treesitter`
+
+			--  This function gets run when an LSP attaches to a particular buffer.
+			--    That is to say, every time a new file is opened that is associated with
+			--    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
+			--    function will be executed to configure the current buffer
+			vim.api.nvim_create_autocmd('LspAttach', {
+				group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+				callback = require('configs.lspconfig').on_attach
+			})
 
 			-- LSP servers and clients are able to communicate to each other what features they support.
 			--  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -241,11 +299,12 @@ return {
 					-- capabilities = {},
 					settings = {
 						Lua = {
+							diagnostics = {
+								globals = { "vim" },
+							},
 							completion = {
 								callSnippet = 'Replace',
 							},
-							-- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-							-- diagnostics = { disable = { 'missing-fields' } },
 						},
 					},
 				},
@@ -260,10 +319,13 @@ return {
 				handlers = {
 					function(server_name)
 						local server = servers[server_name] or {}
+
 						-- This handles overriding only values explicitly passed
 						-- by the server configuration above. Useful when disabling
 						-- certain features of an LSP (for example, turning off formatting for tsserver)
 						server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+						server.on_init = require('configs.lspconfig').on_init
+
 						require('lspconfig')[server_name].setup(server)
 					end,
 				},
