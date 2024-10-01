@@ -276,7 +276,7 @@ return {
 			},
 			checked = {
 				-- Replaces '[x]' of 'task_list_marker_checked'
-				icon = '󰱒 ',
+				icon = ' ',
 				-- Highligh for the checked icon
 				highlight = 'RenderMarkdownChecked',
 			},
@@ -288,7 +288,9 @@ return {
 			--   'rendered':  Replaces the 'raw' value when rendering
 			--   'highlight': Highlight for the 'rendered' icon
 			custom = {
-				todo = { raw = '[-]', rendered = '󰥔 ', highlight = 'RenderMarkdownTodo' },
+				right_arrow = { raw = '[>]', rendered = " ", highlight = "ObsidianRightArrow" },
+				info = { raw = '[~]', rendered = "󰰱 ", highlight = "ObsidianTilde" },
+				important = { raw = '[!]', rendered = " ", highlight = "ObsidianImportant" },
 			},
 		},
 		quote = {
