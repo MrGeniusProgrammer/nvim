@@ -337,7 +337,32 @@ return {
 	config = function(_, opts)
 		require('obsidian').setup(opts)
 
+		local function map(key, func, desc, mode)
+			mode = mode or 'n'
+			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, silent = true, noremap = true })
+		end
+
 		-- navigate to vaults
-		vim.keymap.set("n", "<leader>oo", ":cd ~/vaults/")
+		map("<leader>onv", ":cd ~/vaults/", '[N]avigate to [V]aults')
+
+		-- convert note to template and remove leading white space
+		map("<leader>onn", ":ObsidianTemplate note<cr>", '[N]ew [N]ote')
+
+		local builtin = require 'telescope.builtin'
+
+		-- search for notes
+		map("<leader>osn", function()
+			builtin.find_files({
+				search_dirs = { "~/vaults/personal/notes/" }
+			})
+		end, "[S]earch [N]otes")
+
+		map("<leader>oa", function()
+			require("utils").pick_from_list("Chose a directory to move it to", { "notes", "templates", "inbox" },
+				function(dir)
+					vim.cmp(
+						":!mv '%:p' ~/vaults/personal/" .. dir .. "<cr>:bd<cr>")
+				end)
+		end, "[A]ccept")
 	end
 }
