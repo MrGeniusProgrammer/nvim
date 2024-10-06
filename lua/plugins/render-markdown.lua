@@ -288,8 +288,8 @@ return {
 			--   'rendered':  Replaces the 'raw' value when rendering
 			--   'highlight': Highlight for the 'rendered' icon
 			custom = {
-				right_arrow = { raw = '[>]', rendered = " ", highlight = "ObsidianRightArrow" },
-				info = { raw = '[~]', rendered = "󰰱 ", highlight = "ObsidianTilde" },
+				followup = { raw = '[>]', rendered = " ", highlight = "ObsidianRightArrow" },
+				cancelled = { raw = '[~]', rendered = "󰰱 ", highlight = "ObsidianTilde" },
 				important = { raw = '[!]', rendered = " ", highlight = "ObsidianImportant" },
 			},
 		},
@@ -391,7 +391,7 @@ return {
 			-- Inlined with 'email_autolink' elements
 			email = '󰀓 ',
 			-- Fallback icon for 'inline_link' elements
-			hyperlink = '󰌹 ',
+			hyperlink = '',
 			-- Applies to the fallback inlined icon
 			highlight = 'RenderMarkdownLink',
 			-- Define custom destination patterns so icons can quickly inform you of what a link

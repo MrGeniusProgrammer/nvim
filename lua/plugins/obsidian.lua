@@ -1,3 +1,6 @@
+local date_format = "%d-%m-%Y"
+local time_format = "%H:%M"
+
 return {
 	"epwalsh/obsidian.nvim",
 	version = "*", -- recommended, use latest release instead of latest commit
@@ -42,29 +45,15 @@ return {
 		--  * "notes_subdir" - put new notes in the default notes subdirectory.
 		new_notes_location = "notes_subdir",
 
-		-- Optional, set the log level for obsidian.nvim. This is an integer corresponding to one of the log
-		-- levels defined by "vim.log.levels.*".
-		log_level = vim.log.levels.INFO,
-
 		daily_notes = {
 			-- Optional, if you keep daily notes in a separate directory.
 			folder = "journal",
 			-- Optional, if you want to change the date format for the ID of daily notes.
-			date_format = "%Y-%m-%d",
+			date_format = date_format,
 			-- Optional, if you want to change the date format of the default alias of daily notes.
 			alias_format = "%B %-d, %Y",
-			-- Optional, default tags to add to each new daily note created.
-			default_tags = { "daily", "journal" },
 			-- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
-			template = 'note.md'
-		},
-
-		-- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
-		completion = {
-			-- Set to false to disable completion.
-			nvim_cmp = true,
-			-- Trigger completion at 2 chars.
-			min_chars = 2,
+			template = 'daily.md'
 		},
 
 		-- Optional, configure key mappings. These are the defaults. If you don't want to set any keymappings this
@@ -77,20 +66,6 @@ return {
 				end,
 				opts = { noremap = false, expr = true, buffer = true },
 			},
-			-- Toggle check-boxes.
-			["<leader>ch"] = {
-				action = function()
-					return require("obsidian").util.toggle_checkbox()
-				end,
-				opts = { buffer = true },
-			},
-			-- Smart action depending on context, either follow link or toggle checkbox.
-			["<cr>"] = {
-				action = function()
-					return require("obsidian").util.smart_action()
-				end,
-				opts = { buffer = true, expr = true },
-			}
 		},
 
 
@@ -143,34 +118,13 @@ return {
 
 		-- Optional, boolean or a function that takes a filename and returns a boolean.
 		-- `true` indicates that you don't want obsidian.nvim to manage frontmatter.
-		disable_frontmatter = false,
-
-		-- Optional, alternatively you can customize the frontmatter data.
-		---@return table
-		note_frontmatter_func = function(note)
-			-- Add the title of the note as an alias.
-			if note.title then
-				note:add_alias(note.title)
-			end
-
-			local out = { id = note.id, aliases = note.aliases, tags = note.tags }
-
-			-- `note.metadata` contains any manually added fields in the frontmatter.
-			-- So here we just make sure those fields are kept in the frontmatter.
-			if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-				for k, v in pairs(note.metadata) do
-					out[k] = v
-				end
-			end
-
-			return out
-		end,
+		disable_frontmatter = true,
 
 		-- Optional, for templates (see below).
 		templates = {
 			folder = "templates",
-			date_format = "%Y-%m-%d",
-			time_format = "%H:%M",
+			date_format = date_format,
+			time_format = time_format,
 			-- A map for custom variables, the key should be the variable and the value a function
 			substitutions = {},
 		},
@@ -180,19 +134,19 @@ return {
 		---@param url string
 		follow_url_func = function(url)
 			-- Open the URL in the default web browser.
-			vim.fn.jobstart({ "open", url }) -- Mac OS
+			-- vim.fn.jobstart({ "open", url }) -- Mac OS
 			-- vim.fn.jobstart({"xdg-open", url})  -- linux
 			-- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
-			-- vim.ui.open(url) -- need Neovim 0.10.0+
+			vim.ui.open(url) -- need Neovim 0.10.0+
 		end,
 
 		-- Optional, by default when you use `:ObsidianFollowLink` on a link to an image
 		-- file it will be ignored but you can customize this behavior here.
 		---@param img string
 		follow_img_func = function(img)
-			vim.fn.jobstart { "qlmanage", "-p", img } -- Mac OS quick look preview
+			-- vim.fn.jobstart { "qlmanage", "-p", img } -- Mac OS quick look preview
 			-- vim.fn.jobstart({"xdg-open", url})  -- linux
-			-- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
+			vim.cmd(':silent exec "!start ' .. img .. '"') -- Windows
 		end,
 
 		-- Optional, set to true if you use the Obsidian Advanced URI plugin.
@@ -313,7 +267,7 @@ return {
 			-- The default folder to place images in via `:ObsidianPasteImg`.
 			-- If this is a relative path it will be interpreted as relative to the vault root.
 			-- You can always override this per image by passing a full path to the command instead of just a filename.
-			img_folder = "~/assets/imgs", -- This is the default
+			img_folder = "~/assets/images", -- This is the default
 
 			-- Optional, customize the default name or prefix when pasting images via `:ObsidianPasteImg`.
 			---@return string
@@ -339,30 +293,33 @@ return {
 
 		local function map(key, func, desc, mode)
 			mode = mode or 'n'
-			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, silent = true, noremap = true })
+			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, noremap = false })
 		end
 
-		-- navigate to vaults
-		map("<leader>onv", ":cd ~/vaults/", '[N]avigate to [V]aults')
+		map("<leader>ow", ":ObsidianWorkspace<cr>", '[W]orkspaces')
 
-		-- convert note to template and remove leading white space
-		map("<leader>onn", ":ObsidianTemplate note<cr>", '[N]ew [N]ote')
+		map("<leader>opv", ":cd ~/vaults/personal/<cr>", "[P]ersonal [V]ault")
 
-		local builtin = require 'telescope.builtin'
+		map("<leader>oqs", ":ObsidianQuickSwitch<cr>", "[Q]uick [S]witch")
 
-		-- search for notes
-		map("<leader>osn", function()
-			builtin.find_files({
-				search_dirs = { "~/vaults/personal/notes/" }
-			})
-		end, "[S]earch [N]otes")
+		map("<leader>onn", ":ObsidianNew<cr>", "[N]ew [N]ote")
+
+		map('<leader>obl', ":ObsidianBacklinks<cr>", "[B]ack[L]inks")
+
+		map('<leader>odn', ":ObsidianToday<cr>", "[D]aily [N]ote")
+
+		map("<leader>ot", ":ObsidianTemplate<cr>", "[T]emplate")
+
+		map("<leader>ol", ":ObsidianLinks<cr>", "[L]inks")
+
+		map("<leader>oen", ":ObsidianExtractNote<cr>", "[E]xtract [N]ote")
+
+		map("<leader>orn", ":ObsidianRename<cr>", "[R]ename Current [N]ote")
 
 		map("<leader>oa", function()
-			require("utils").pick_from_list("Chose a directory to move it to", { "notes", "templates", "inbox" },
-				function(dir)
-					vim.cmp(
-						":!mv '%:p' ~/vaults/personal/" .. dir .. "<cr>:bd<cr>")
-				end)
+			local dir = vim.fn.expand('~') .. "\\vaults\\personal\\notes\\"
+			vim.cmd("!mv '%:p' " .. dir)
+			vim.cmd("bd")
 		end, "[A]ccept")
 	end
 }

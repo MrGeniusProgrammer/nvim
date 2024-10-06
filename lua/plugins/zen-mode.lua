@@ -82,5 +82,15 @@ return {
 		-- callback where you can add custom code when the Zen window closes
 		on_close = function()
 		end,
-	}
+	},
+	config = function(_, opts)
+		require("zen-mode").setup(opts)
+
+		local function map(key, fn, desc, mode)
+			mode = mode or 'n'
+			vim.keymap.set(mode, key, fn, { desc = "Zen Mode: " .. desc, silent = true })
+		end
+
+		map("<leader>z", require("zen-mode").toggle, "Toggle")
+	end
 }

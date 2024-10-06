@@ -58,7 +58,6 @@ return {
 	config = function(_, opts)
 		local api = require("nvim-tree.api")
 
-		-- global
 		vim.keymap.set(
 			"n",
 			"<leader>e",
