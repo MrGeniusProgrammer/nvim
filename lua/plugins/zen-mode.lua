@@ -1,6 +1,5 @@
 return {
 	"folke/zen-mode.nvim",
-	lazy = false,
 	opts = {
 		window = {
 			backdrop = 0.95, -- shade the backdrop of the Zen window. Set to 1 to keep the same as Normal
@@ -31,12 +30,12 @@ return {
 				showcmd = false, -- disables the command in the last line of the screen
 				-- you may turn on/off statusline in zen mode by setting 'laststatus'
 				-- statusline will be shown only if 'laststatus' == 3
-				laststatus = 0,            -- turn off the statusline in zen mode
+				laststatus = 0, -- turn off the statusline in zen mode
 			},
 			twilight = { enabled = true }, -- enable to start Twilight when zen mode opens
 			gitsigns = { enabled = false }, -- disables git signs
-			tmux = { enabled = false },  -- disables the tmux statusline
-			todo = { enabled = false },  -- if set to "true", todo-comments.nvim highlights will be disabled
+			tmux = { enabled = false }, -- disables the tmux statusline
+			todo = { enabled = false }, -- if set to "true", todo-comments.nvim highlights will be disabled
 			-- this will change the font size on kitty when in zen mode
 			-- to make this work, you need to set the following kitty options:
 			-- - allow_remote_control socket-only
@@ -73,24 +72,22 @@ return {
 					neovide_position_animation_length = 0,
 					neovide_cursor_animation_length = 0,
 					neovide_cursor_vfx_mode = "",
-				}
+				},
 			},
 		},
 		-- callback where you can add custom code when the Zen window opens
-		on_open = function(win)
-		end,
+		on_open = function(win) end,
 		-- callback where you can add custom code when the Zen window closes
-		on_close = function()
-		end,
+		on_close = function() end,
 	},
-	config = function(_, opts)
-		require("zen-mode").setup(opts)
-
-		local function map(key, fn, desc, mode)
-			mode = mode or 'n'
-			vim.keymap.set(mode, key, fn, { desc = "Zen Mode: " .. desc, silent = true })
-		end
-
-		map("<leader>z", require("zen-mode").toggle, "Toggle")
-	end
+	keys = {
+		{
+			"<leader>z",
+			function()
+				require("zen-mode").toggle()
+			end,
+			mode = "n",
+			desc = "Zen Mode: Toggle",
+		},
+	},
 }

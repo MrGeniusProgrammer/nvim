@@ -1,6 +1,5 @@
 return {
 	"williamboman/mason.nvim",
-	lazy = false,
 	cmd = { "Mason", "MasonInstall", "MasonInstallAll", "MasonUpdate" },
 	opts = {
 		PATH = "skip",
@@ -25,7 +24,10 @@ return {
 					"healthSuccess",
 				},
 				{ "   Currently supported plugins are : lspconfig, nvim-lint, conform. \n", "Added" },
-				{ "   So dont add them in your chadrc as MasonInstallAll automatically installs them! \n", "Changed" },
+				{
+					"   So dont add them in your chadrc as MasonInstallAll automatically installs them! \n",
+					"Changed",
+				},
 			}, false, {})
 		end
 

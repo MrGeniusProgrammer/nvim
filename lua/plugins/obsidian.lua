@@ -4,20 +4,20 @@ local time_format = "%H:%M"
 return {
 	"epwalsh/obsidian.nvim",
 	version = "*", -- recommended, use latest release instead of latest commit
-	lazy = false,
 	ft = "markdown",
 	-- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
-	-- event = {
-	--   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-	--   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
-	--   -- refer to `:h file-pattern` for more examples
-	--   "BufReadPre path/to/my-vault/*.md",
-	--   "BufNewFile path/to/my-vault/*.md",
-	-- },
+	event = {
+		"BufReadPre " .. vim.fn.expand("~") .. "/vaults/**.md",
+		"BufNewFile " .. vim.fn.expand("~") .. "/vaults/**.md",
+		--   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+		--   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
+		--   -- refer to `:h file-pattern` for more examples
+		--   "BufReadPre path/to/my-vault/*.md",
+		--   "BufNewFile path/to/my-vault/*.md",
+	},
 	dependencies = {
 		-- Required.
 		"nvim-lua/plenary.nvim",
-
 	},
 	opts = {
 		-- A list of workspace names, paths, and configuration overrides.
@@ -53,7 +53,7 @@ return {
 			-- Optional, if you want to change the date format of the default alias of daily notes.
 			alias_format = "%B %-d, %Y",
 			-- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
-			template = 'daily.md'
+			template = "daily.md",
 		},
 
 		-- Optional, configure key mappings. These are the defaults. If you don't want to set any keymappings this
@@ -67,7 +67,6 @@ return {
 				opts = { noremap = false, expr = true, buffer = true },
 			},
 		},
-
 
 		-- Optional, customize how note IDs are generated given an optional title.
 		---@param title string|?
@@ -220,7 +219,7 @@ return {
 		-- Optional, configure additional syntax highlighting / extmarks.
 		-- This requires you have `conceallevel` set to 1 or 2. See `:help conceallevel` for more details.
 		ui = {
-			enable = false,      -- set to false to disable all additional syntax features
+			enable = false, -- set to false to disable all additional syntax features
 			update_debounce = 200, -- update delay after a text change (in milliseconds)
 			max_file_length = 5000, -- disable UI features for files with more than this many lines
 			-- Define how various check-boxes are displayed
@@ -289,14 +288,14 @@ return {
 		},
 	},
 	config = function(_, opts)
-		require('obsidian').setup(opts)
+		require("obsidian").setup(opts)
 
 		local function map(key, func, desc, mode)
-			mode = mode or 'n'
+			mode = mode or "n"
 			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, noremap = false })
 		end
 
-		map("<leader>ow", ":ObsidianWorkspace<cr>", '[W]orkspaces')
+		map("<leader>ow", ":ObsidianWorkspace<cr>", "[W]orkspaces")
 
 		map("<leader>opv", ":cd ~/vaults/personal/<cr>", "[P]ersonal [V]ault")
 
@@ -304,9 +303,9 @@ return {
 
 		map("<leader>onn", ":ObsidianNew<cr>", "[N]ew [N]ote")
 
-		map('<leader>obl', ":ObsidianBacklinks<cr>", "[B]ack[L]inks")
+		map("<leader>obl", ":ObsidianBacklinks<cr>", "[B]ack[L]inks")
 
-		map('<leader>odn', ":ObsidianToday<cr>", "[D]aily [N]ote")
+		map("<leader>odn", ":ObsidianToday<cr>", "[D]aily [N]ote")
 
 		map("<leader>ot", ":ObsidianTemplate<cr>", "[T]emplate")
 
@@ -317,9 +316,9 @@ return {
 		map("<leader>orn", ":ObsidianRename<cr>", "[R]ename Current [N]ote")
 
 		map("<leader>oa", function()
-			local dir = vim.fn.expand('~') .. "\\vaults\\personal\\notes\\"
+			local dir = vim.fn.expand("~") .. "\\vaults\\personal\\notes\\"
 			vim.cmd("!mv '%:p' " .. dir)
 			vim.cmd("bd")
 		end, "[A]ccept")
-	end
+	end,
 }

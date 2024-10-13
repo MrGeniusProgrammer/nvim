@@ -1,55 +1,46 @@
+local prettier = { "prettierd", "prettier", stop_after_first = true }
+
 return {
 	"stevearc/conform.nvim",
-	lazy = false,
+	event = { "BufWritePre", "BufNewFile" },
+	cmd = { "ConformInfo" },
 	opts = {
 		notify_on_error = false,
-		format_on_save = function(bufnr)
-			-- Disable "format_on_save lsp_fallback" for languages that don't
-			-- have a well standardized coding style. You can add additional
-			-- languages here or re-enable it for the disabled ones.
-			local disable_filetypes = { c = true, cpp = true }
-			local lsp_format_opt
-			if disable_filetypes[vim.bo[bufnr].filetype] then
-				lsp_format_opt = 'never'
-			else
-				lsp_format_opt = 'fallback'
-			end
-			return {
-				timeout_ms = 500,
-				lsp_format = lsp_format_opt,
-			}
-		end,
 		formatters_by_ft = {
-			javascript = { "prettier" },
-			typescript = { "prettier" },
-			javascriptreact = { "prettier" },
-			typescriptreact = { "prettier" },
-			svelte = { "prettier" },
-			css = { "prettier" },
-			html = { "prettier" },
-			json = { "prettier" },
-			yaml = { "prettier" },
-			markdown = { "prettier" },
-			graphql = { "prettier" },
+			markdown = prettier,
+			javascript = prettier,
+			typescript = prettier,
+			javascriptreact = prettier,
+			typescriptreact = prettier,
+			svelte = prettier,
+			css = prettier,
+			html = prettier,
+			json = prettier,
+			yaml = prettier,
+			graphql = prettier,
 			lua = { "stylua" },
 			python = { "isort", "black" },
 		},
 		format_on_save = {
-			lsp_fallback = true,
+			-- These options will be passed to conform.format()
 			async = false,
-			timeout_ms = 500,
+			timeout_ms = 50000,
+			lsp_fallback = true,
 		},
 	},
-	event = { 'BufWritePre' },
-	cmd = { 'ConformInfo' },
 	keys = {
 		{
-			'<leader>fb',
+			"<leader>fb",
 			function()
-				require('conform').format { async = true, lsp_format = 'fallback' }
+				require("conform").format({ async = true, lsp_format = "fallback" })
 			end,
-			mode = '',
-			desc = '[F]ormat [B]uffer',
+			mode = "",
+			desc = "[F]ormat [B]uffer",
+		},
+		{
+			"<leader>fi", -- Format Info
+			"<cmd>ConformInfo<cr>",
+			desc = "[F]ormat [I]nfo",
 		},
 	},
 }

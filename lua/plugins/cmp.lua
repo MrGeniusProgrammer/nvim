@@ -1,6 +1,5 @@
 return {
 	"hrsh7th/nvim-cmp",
-	lazy = false,
 	event = "InsertEnter",
 	dependencies = {
 		{
@@ -24,7 +23,7 @@ return {
 		},
 	},
 	opts = function()
-		local cmp = require('cmp')
+		local cmp = require("cmp")
 		return {
 			completion = {
 				completeopt = "menu,menuone",
@@ -49,10 +48,15 @@ return {
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<C-e>"] = cmp.mapping.close(),
 
-				["<CR>"] = cmp.mapping.confirm {
+				["<C-y>"] = cmp.mapping.confirm({
 					behavior = cmp.ConfirmBehavior.Insert,
 					select = true,
-				},
+				}),
+
+				["<CR>"] = cmp.mapping.confirm({
+					behavior = cmp.ConfirmBehavior.Insert,
+					select = true,
+				}),
 
 				["<Tab>"] = cmp.mapping(function(fallback)
 					if cmp.visible() then

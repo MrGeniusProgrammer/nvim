@@ -1,7 +1,7 @@
 return {
 	"nvim-tree/nvim-tree.lua",
-	lazy = false,
 	cmd = { "NvimTreeToggle", "NvimTreeFocus" },
+	event = "VimEnter",
 	opts = {
 		filters = { dotfiles = false },
 		disable_netrw = true,
@@ -24,8 +24,8 @@ return {
 				hint = "",
 				info = "",
 				warning = "",
-				error = ""
-			}
+				error = "",
+			},
 		},
 		renderer = {
 			root_folder_label = false,
@@ -55,20 +55,14 @@ return {
 			},
 		},
 	},
-	config = function(_, opts)
-		local api = require("nvim-tree.api")
-
-		vim.keymap.set(
-			"n",
+	keys = {
+		{
 			"<leader>e",
-			api.tree.focus,
-			{
-				desc = "nvimtree: close tree when foucsed else focus on it when not selected",
-				silent = true,
-				noremap = true
-			}
-		)
-
-		require('nvim-tree').setup(opts)
-	end
+			function()
+				require("nvim-tree.api").tree.focus()
+			end,
+			mode = "n",
+			desc = "Focus on [E]xplorer",
+		},
+	},
 }
