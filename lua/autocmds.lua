@@ -3,9 +3,9 @@ local autocmd = vim.api.nvim_create_autocmd
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
-autocmd('TextYankPost', {
-	desc = 'Highlight when yanking (copying) text',
-	group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
+autocmd("TextYankPost", {
+	desc = "Highlight when yanking (copying) text",
+	group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
 	callback = function()
 		vim.highlight.on_yank()
 	end,
@@ -24,7 +24,7 @@ autocmd({ "UIEnter", "BufReadPost", "BufNewFile" }, {
 
 		if file ~= "" and buftype ~= "nofile" and vim.g.ui_entered then
 			vim.api.nvim_exec_autocmds("User", { pattern = "FilePost", modeline = false })
-			vim.api.nvim_del_augroup_by_name "NvFilePost"
+			vim.api.nvim_del_augroup_by_name("NvFilePost")
 
 			vim.schedule(function()
 				vim.api.nvim_exec_autocmds("FileType", {})

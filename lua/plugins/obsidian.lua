@@ -7,8 +7,8 @@ return {
 	ft = "markdown",
 	-- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
 	event = {
-		"BufReadPre " .. vim.fn.expand("~") .. "/vaults/**.md",
-		"BufNewFile " .. vim.fn.expand("~") .. "/vaults/**.md",
+		"BufReadPre " .. vim.fn.expand("~") .. "/vaults/*.md",
+		"BufNewFile " .. vim.fn.expand("~") .. "/vaults/*.md",
 		--   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
 		--   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
 		--   -- refer to `:h file-pattern` for more examples
@@ -89,8 +89,6 @@ return {
 		end,
 
 		-- Optional, customize how note file names are generated given the ID, target directory, and title.
-		---@param spec { id: string, dir: obsidian.Path, title: string|? }
-		---@return string|obsidian.Path The full path to the new note.
 		note_path_func = function(spec)
 			-- This is equivalent to the default behavior.
 			local path = spec.dir / tostring(spec.id)
@@ -189,33 +187,6 @@ return {
 		-- 3. "hsplit" - to open in a horizontal split if there's not already a horizontal split
 		open_notes_in = "current",
 
-		-- Optional, define your own callbacks to further customize behavior.
-		callbacks = {
-			-- Runs at the end of `require("obsidian").setup()`.
-			---@param client obsidian.Client
-			post_setup = function(client) end,
-
-			-- Runs anytime you enter the buffer for a note.
-			---@param client obsidian.Client
-			---@param note obsidian.Note
-			enter_note = function(client, note) end,
-
-			-- Runs anytime you leave the buffer for a note.
-			---@param client obsidian.Client
-			---@param note obsidian.Note
-			leave_note = function(client, note) end,
-
-			-- Runs right before writing the buffer for a note.
-			---@param client obsidian.Client
-			---@param note obsidian.Note
-			pre_write_note = function(client, note) end,
-
-			-- Runs anytime the workspace is set/changed.
-			---@param client obsidian.Client
-			---@param workspace obsidian.Workspace
-			post_set_workspace = function(client, workspace) end,
-		},
-
 		-- Optional, configure additional syntax highlighting / extmarks.
 		-- This requires you have `conceallevel` set to 1 or 2. See `:help conceallevel` for more details.
 		ui = {
@@ -278,9 +249,6 @@ return {
 			-- A function that determines the text to insert in the note when pasting an image.
 			-- It takes two arguments, the `obsidian.Client` and an `obsidian.Path` to the image file.
 			-- This is the default implementation.
-			---@param client obsidian.Client
-			---@param path obsidian.Path the absolute path to the image file
-			---@return string
 			img_text_func = function(client, path)
 				path = client:vault_relative_path(path) or path
 				return string.format("![%s](%s)", path.name, path)
@@ -295,14 +263,6 @@ return {
 			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, noremap = false })
 		end
 
-		map("<leader>ow", ":ObsidianWorkspace<cr>", "[W]orkspaces")
-
-		map("<leader>opv", ":cd ~/vaults/personal/<cr>", "[P]ersonal [V]ault")
-
-		map("<leader>oqs", ":ObsidianQuickSwitch<cr>", "[Q]uick [S]witch")
-
-		map("<leader>onn", ":ObsidianNew<cr>", "[N]ew [N]ote")
-
 		map("<leader>obl", ":ObsidianBacklinks<cr>", "[B]ack[L]inks")
 
 		map("<leader>odn", ":ObsidianToday<cr>", "[D]aily [N]ote")
@@ -314,11 +274,36 @@ return {
 		map("<leader>oen", ":ObsidianExtractNote<cr>", "[E]xtract [N]ote")
 
 		map("<leader>orn", ":ObsidianRename<cr>", "[R]ename Current [N]ote")
-
-		map("<leader>oa", function()
-			local dir = vim.fn.expand("~") .. "\\vaults\\personal\\notes\\"
-			vim.cmd("!mv '%:p' " .. dir)
-			vim.cmd("bd")
-		end, "[A]ccept")
 	end,
+	keys = {
+		{
+			"<leader>oa",
+			function()
+				local dir = vim.fn.expand("~") .. "\\vaults\\personal\\notes\\"
+				vim.cmd("!mv '%:p' " .. dir)
+				vim.cmd("bd")
+			end,
+			desc = "[O]bsidian [A]ccept",
+		},
+		{
+			"<leader>ow",
+			":ObsidianWorkspace<CR>",
+			desc = "[O]bsidian [W]orkspaces",
+		},
+		{
+			"<leader>opv",
+			":cd ~/vaults/personal/<cr>",
+			desc = "[O]bsidian [P]ersonal [V]ault",
+		},
+		{
+			"<leader>oqs",
+			":ObsidianQuickSwitch<CR>",
+			desc = "[O]bsidian [Q]uick [S]witch",
+		},
+		{
+			"<leader>onn",
+			":ObsidianNew<cr>",
+			desc = "[O]bsidian [N]ew [N]ote",
+		},
+	},
 }
