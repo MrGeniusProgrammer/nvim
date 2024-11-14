@@ -255,27 +255,37 @@ return {
 			end,
 		},
 	},
-	config = function(_, opts)
-		require("obsidian").setup(opts)
-
-		local function map(key, func, desc, mode)
-			mode = mode or "n"
-			vim.keymap.set(mode, key, func, { desc = "Obsidian: " .. desc, noremap = false })
-		end
-
-		map("<leader>obl", ":ObsidianBacklinks<cr>", "[B]ack[L]inks")
-
-		map("<leader>odn", ":ObsidianToday<cr>", "[D]aily [N]ote")
-
-		map("<leader>ot", ":ObsidianTemplate<cr>", "[T]emplate")
-
-		map("<leader>ol", ":ObsidianLinks<cr>", "[L]inks")
-
-		map("<leader>oen", ":ObsidianExtractNote<cr>", "[E]xtract [N]ote")
-
-		map("<leader>orn", ":ObsidianRename<cr>", "[R]ename Current [N]ote")
-	end,
 	keys = {
+		{
+			"<leader>obl",
+			":ObsidianBacklinks<cr>",
+			desc = "[O]bsidian [B]ack[L]inks",
+		},
+		{
+			"<leader>odn",
+			":ObsidianToday<cr>",
+			desc = "[O]bsidian [D]aily [N]ote",
+		},
+		{
+			"<leader>ot",
+			":ObsidianTemplate<cr>",
+			desc = "[O]bsidian [T]emplate",
+		},
+		{
+			"<leader>ol",
+			":ObsidianLinks<cr>",
+			desc = "[O]bsidian [L]inks",
+		},
+		{
+			"<leader>oen",
+			":ObsidianExtractNote<cr>",
+			desc = "[O]bsidian [E]xtract [N]ote",
+		},
+		{
+			"<leader>orn",
+			":ObsidianRename<cr>",
+			desc = "[O]bsidian [R]ename Current [N]ote",
+		},
 		{
 			"<leader>oa",
 			function()
