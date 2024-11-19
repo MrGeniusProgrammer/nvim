@@ -116,5 +116,5 @@ return {
 		-- See 'Custom Handlers' document for more info
 		custom_handlers = {},
 	},
-	dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" }, -- if you prefer nvim-web-devicons
+	dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons", "epwalsh/obsidian.nvim" }, -- if you prefer nvim-web-devicons
 }
